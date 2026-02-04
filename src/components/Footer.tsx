@@ -46,9 +46,9 @@ const Footer: React.FC<FooterProps> = ({ onOpenModal }) => {
             <ul className="space-y-4">
               {FOOTER_LINKS.SERVICES.map((item) => (
                 <li key={item}>
-                  <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors font-light">
+                  <span className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors font-light cursor-default">
                     {item}
-                  </a>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -72,7 +72,7 @@ const Footer: React.FC<FooterProps> = ({ onOpenModal }) => {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200 dark:border-white/5">
           <p className="text-sm text-gray-500 dark:text-gray-400 font-light">
-            © 2025 Redstone Engenharia. Todos os direitos reservados.
+            © 2026 Redstone Engenharia. Todos os direitos reservados.
           </p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link to="/politica-de-privacidade" className="text-gray-400 hover:text-primary transition-colors text-sm font-light">Política de Privacidade</Link>
