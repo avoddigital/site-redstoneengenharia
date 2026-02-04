@@ -2,6 +2,10 @@ import React from 'react';
 import Icon from './Icon';
 
 const TrustedBy: React.FC = () => {
+  // Seção oculta temporariamente - Voltar quando tiver mais clientes
+  return null;
+
+  /*
   return (
     <section className="py-12 border-b border-gray-100 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -28,6 +32,7 @@ const TrustedBy: React.FC = () => {
       </div>
     </section>
   );
+  */
 };
 
 export default TrustedBy;

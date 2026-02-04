@@ -20,8 +20,8 @@ const Testimonials: React.FC = () => {
             className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-800" 
           />
           <div className="text-left">
-            <p className="text-sm font-bold text-gray-900 dark:text-white">James Sterling</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">CEO, Sterling Logistics</p>
+            <p className="text-sm font-bold text-gray-900 dark:text-white">Murillo Alvarez Alves</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">CEO, Engenheiro Civil</p>
           </div>
         </div>
       </div>

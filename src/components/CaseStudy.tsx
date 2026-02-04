@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Icon from './Icon';
 import { IMAGES } from '../constants';
 
@@ -43,12 +44,12 @@ const CaseStudy: React.FC = () => {
               </div>
             </div>
 
-            <a href="#" className="inline-flex items-center text-white font-medium hover:text-primary transition-colors">
-              Ler Estudo de Caso
+            <Link to="/projetos" className="inline-flex items-center text-white font-medium hover:text-primary transition-colors">
+              Ver projetos
               <span className="ml-2">
                  <Icon name="arrow_forward" className="text-sm" />
               </span>
-            </a>
+            </Link>
           </div>
 
         </div>

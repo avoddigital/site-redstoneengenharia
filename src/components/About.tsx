@@ -26,7 +26,7 @@ const About: React.FC = () => {
               <div className="mb-4">
                  <Icon name="engineering" className="text-4xl text-primary group-hover:scale-110 transition-transform inline-block" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">10+</h3>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">2</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Anos de experiência</p>
             </div>
 
@@ -34,14 +34,14 @@ const About: React.FC = () => {
               <div className="mb-4">
                  <Icon name="domain" className="text-4xl text-primary group-hover:scale-110 transition-transform inline-block" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">500+</h3>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">4</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">Projetos entregues</p>
             </div>
 
             <div className="bg-surface-light dark:bg-surface-dark p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/30 transition-colors group col-span-2">
               <div className="flex items-center justify-between mb-4">
                  <Icon name="safety_check" className="text-4xl text-primary group-hover:scale-110 transition-transform" />
-                 <Icon name="arrow_forward" className="text-gray-300 dark:text-gray-600" />
+                 {/* <Icon name="arrow_forward" className="text-gray-300 dark:text-gray-600" /> - Voltar quando tiver algo para adicionar*/}
               </div>
               <h3 className="text-2xl font-medium text-gray-900 dark:text-white mb-2">Protocolo de Segurança</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">

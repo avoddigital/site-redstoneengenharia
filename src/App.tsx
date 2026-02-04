@@ -1,27 +1,27 @@
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import TrustedBy from './components/TrustedBy';
-import About from './components/About';
-import Services from './components/Services';
-import CaseStudy from './components/CaseStudy';
-import Testimonials from './components/Testimonials';
-import Footer from './components/Footer';
+import { Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import ProjectsPage from './pages/ProjectsPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfUsePage from './pages/TermsOfUsePage';
+import ScrollToTop from './components/ScrollToTop';
+import { CookieConsentProvider } from './context/CookieConsentContext';
+import CookieBanner from './components/cookies/CookieBanner';
+import CookiePreferencesModal from './components/cookies/CookiePreferencesModal';
 
 const App: React.FC = () => {
   return (
-    <div className="relative">
-      <Navbar />
-      <main>
-        <Hero />
-        <TrustedBy />
-        <About />
-        <Services />
-        <CaseStudy />
-        <Testimonials />
-      </main>
-      <Footer />
-    </div>
+    <CookieConsentProvider>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projetos" element={<ProjectsPage />} />
+        <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
+        <Route path="/termos-de-uso" element={<TermsOfUsePage />} />
+      </Routes>
+      <CookieBanner />
+      <CookiePreferencesModal />
+    </CookieConsentProvider>
   );
 };
 
