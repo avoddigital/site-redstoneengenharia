@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import TransitionLink from './TransitionLink';
 import Icon from './Icon';
+import Button from './Button';
 import { IMAGES } from '../constants';
 
 const PREMIUM_EASE = [0.22, 1, 0.36, 1];
@@ -103,25 +104,43 @@ const Hero: React.FC = () => {
                 A Redstone Engenharia entrega soluções de infraestrutura ultramodernas. Unimos engenharia rigorosa com elegância arquitetônica para construir a base do amanhã.
               </motion.p>
 
-              {/* CTA Buttons */}
               <motion.div 
                 variants={ctaVariants}
                 className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 pt-4 w-full sm:w-auto"
               >
-                <TransitionLink 
-                  to="/projetos" 
-                  className="w-full sm:w-auto justify-center bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 group/btn"
-                  label="Abrindo portfólio"
+                <div className="w-full sm:w-auto">
+                    <TransitionLink 
+                      to="/projetos" 
+                      className="w-full sm:w-auto inline-flex items-center justify-center rounded-full font-medium transition-all focus:outline-none bg-white text-black shadow-sm px-8 py-4 gap-2 group/btn"
+                      label="Abrindo portfólio"
+                    >
+                      <motion.div
+                          className="flex items-center gap-2 w-full h-full justify-center"
+                          whileHover={shouldReduceMotion ? {} : { y: -1 }}
+                          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                          transition={{ duration: 0.1 }}
+                      >
+                        Ver projetos
+                        <motion.span 
+                            className="transition-transform"
+                            variants={{
+                                hover: { x: shouldReduceMotion ? 0 : 3 }
+                            }}
+                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        >
+                            <Icon name="arrow_outward" />
+                        </motion.span>
+                      </motion.div>
+                    </TransitionLink>
+                </div>
+
+                <Button 
+                   variant="outline"
+                   className="w-full sm:w-auto px-8 py-4 sm:px-8 sm:py-4 border-white/30 hover:bg-white/10 text-white"
+                   icon="play_circle"
                 >
-                  Ver projetos
-                  <span className="transition-transform group-hover/btn:translate-x-1">
-                     <Icon name="arrow_outward" />
-                  </span>
-                </TransitionLink>
-                <button className="w-full sm:w-auto justify-center px-8 py-4 rounded-full font-light text-white border border-white/30 hover:bg-white/10 transition-colors backdrop-blur-sm flex items-center gap-2">
-                  <Icon name="play_circle" />
                   Assistir Showreel
-                </button>
+                </Button>
               </motion.div>
             </motion.div>
           </div>

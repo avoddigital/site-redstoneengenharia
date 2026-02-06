@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Icon from './Icon';
+import Button from './Button';
 import logo from '../assets/logo.png';
 
 interface ProposalModalProps {
@@ -343,15 +344,13 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onSubmit }
 
                         {/* Submit Button */}
                         <div className="flex justify-end pt-4">
-                          <button 
+                          <Button 
                             type="submit"
-                            className="w-full md:w-auto bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
+                            className="w-full md:w-auto shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                            icon="arrow_forward"
                           >
-                            {isEmpresa ? 'Solicitar consultoria' : 'Solicitar Orçamento'}
-                            <span className="transition-transform group-hover:translate-x-1">
-                              <Icon name="arrow_forward" />
-                            </span>
-                          </button>
+                             {isEmpresa ? 'Solicitar consultoria' : 'Solicitar Orçamento'}
+                          </Button>
                         </div>
                       </form>
                     </motion.div>

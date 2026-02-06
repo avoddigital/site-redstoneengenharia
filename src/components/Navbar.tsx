@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import Icon from './Icon';
+import Button from './Button';
 import logo from '../assets/logo.png';
 import { NAV_LINKS } from '../constants';
 
@@ -126,26 +127,13 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
             {/* Right Side Actions */}
             <div className="flex items-center space-x-6">
               
-              <motion.button 
+              <Button 
                 onClick={onOpenModal}
-                className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary focus:outline-none"
-                whileHover={!shouldReduceMotion ? { 
-                    y: -2, 
-                    boxShadow: "0 10px 15px -3px rgba(136, 27, 27, 0.3), 0 4px 6px -2px rgba(136, 27, 27, 0.1)" 
-                } : {}}
-                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
+                className="hidden sm:inline-flex text-sm"
+                icon="arrow_forward"
               >
                 Iniciar conversa
-                <motion.span 
-                    className="ml-2"
-                    variants={{
-                        hover: { x: 4 }
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <Icon name="arrow_forward" className="text-base" />
-                </motion.span>
-              </motion.button>
+              </Button>
 
               {/* Mobile Menu Button (Simple implementation) */}
               <button className="md:hidden p-2 text-gray-600 dark:text-gray-300">
