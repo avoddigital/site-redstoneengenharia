@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import Icon from './Icon';
 import logo from '../assets/logo.png';
 import { NAV_LINKS } from '../constants';
@@ -11,9 +12,10 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const shouldReduceMotion = useReducedMotion();
+  const [activeLink, setActiveLink] = useState('');
 
   useEffect(() => {
-    // ... existing scroll logic ...
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -22,9 +24,47 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Simple active link detection logic
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const currentHash = location.hash;
+    
+    // Default active to home if at root
+    if (currentPath === '/' && !currentHash) {
+        setActiveLink('Início'); // Assuming 'Início' corresponds to '/' or '#home'
+        return;
+    }
+
+    // Mapping logic ideally matches NAV_LINKS structure
+    const foundLink = NAV_LINKS.find(link => {
+       if (link.href === '/') return currentPath === '/' && !currentHash; // or #home
+       if (link.href.startsWith('/#')) {
+           return currentPath === '/' && currentHash === link.href.substring(1);
+       }
+       return currentPath === link.href;
+    });
+
+    if (foundLink) {
+        setActiveLink(foundLink.name);
+    } else {
+        // Fallback for sub-routes or specific interactions
+        if (currentPath === '/') setActiveLink('Início');
+    }
+  }, [location]);
+
   return (
     <>
-      <nav className={`fixed w-full z-50 top-0 transition-all duration-300 border-b ${scrolled ? 'bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md shadow-sm border-gray-200 dark:border-white/10' : 'bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-gray-100 dark:border-white/5'}`}>
+      <motion.nav 
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`sticky top-0 z-50 w-full transition-all duration-300 border-b
+            ${scrolled 
+                ? 'bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md shadow-sm border-neutral-200/60 dark:border-white/10' 
+                : 'bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-transparent'
+            }
+        `}
+      >
         <div className="mx-auto px-4 sm:px-6 lg:px-8 2xl:px-10 w-full max-w-[1200px] 2xl:max-w-[1400px]">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0 flex items-center gap-2">
@@ -52,20 +92,32 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
             <div className="hidden md:flex space-x-10">
               {NAV_LINKS.map((link) => {
                  const isHome = location.pathname === '/';
-                 // If we are on home:
-                 // 1. If link is an anchor (has #), remove the leading slash (/#anchor -> #anchor)
-                 // 2. If link is exactly '/', change to '#' to avoid reload and scroll to top
                  const href = isHome 
                     ? (link.href.startsWith('/#') ? link.href.substring(1) : (link.href === '/' ? '#' : link.href))
                     : link.href;
+                 
+                 const isActive = activeLink === link.name;
 
                  return (
                     <a 
                       key={link.name}
                       href={href}
-                      className="text-sm font-light tracking-wide text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors uppercase"
+                      className={`relative text-sm font-medium tracking-wide transition-colors uppercase py-1
+                        ${isActive 
+                           ? 'text-primary' 
+                           : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:opacity-80'
+                        }
+                      `}
+                      onClick={() => setActiveLink(link.name)}
                     >
                       {link.name}
+                      {isActive && !shouldReduceMotion && (
+                        <motion.span 
+                            layoutId="navbar-underline"
+                            className="absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded-full"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        />
+                      )}
                     </a>
                  );
               })}
@@ -73,17 +125,27 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-6">
-
               
-              <button 
+              <motion.button 
                 onClick={onOpenModal}
-                className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary hover:bg-primary/90 focus:outline-none transition-all duration-300 hover:scale-105"
+                className="hidden sm:inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary focus:outline-none"
+                whileHover={!shouldReduceMotion ? { 
+                    y: -2, 
+                    boxShadow: "0 10px 15px -3px rgba(136, 27, 27, 0.3), 0 4px 6px -2px rgba(136, 27, 27, 0.1)" 
+                } : {}}
+                whileTap={!shouldReduceMotion ? { scale: 0.98 } : {}}
               >
                 Iniciar conversa
-                <span className="ml-2">
+                <motion.span 
+                    className="ml-2"
+                    variants={{
+                        hover: { x: 4 }
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
                   <Icon name="arrow_forward" className="text-base" />
-                </span>
-              </button>
+                </motion.span>
+              </motion.button>
 
               {/* Mobile Menu Button (Simple implementation) */}
               <button className="md:hidden p-2 text-gray-600 dark:text-gray-300">
@@ -92,7 +154,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
             </div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
     </>
   );
 };

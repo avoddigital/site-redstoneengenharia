@@ -6,7 +6,7 @@ import { IMAGES } from '../constants';
 
 const Hero: React.FC = () => {
   return (
-    <section id="home" className="pt-28 pb-12 w-full">
+    <section id="home" className="pt-12 pb-12 w-full">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 2xl:px-10 w-full max-w-[1200px] 2xl:max-w-[1400px] relative group">
         <div className="relative w-full h-[85vh] min-h-[600px] rounded-3xl overflow-hidden shadow-2xl transition-transform duration-700">
           <img 
