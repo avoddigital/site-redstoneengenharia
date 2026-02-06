@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, useInView, useAnimation, useReducedMotion } from 'framer-motion';
 
 // Premium Easing from user request
@@ -16,20 +16,43 @@ interface RevealProps {
 export const Reveal: React.FC<RevealProps> = ({ 
   children, 
   width = "fit-content", 
-  delay = 0,
+  delay = 0.15, // Cinematic start
   className = "",
-  duration = 0.6,
-  threshold = 0.5 // Start when 50% is visible, or customize
+  duration = 0.8, // Cinematic duration
+  threshold = 0.3 
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: threshold });
+  // once: false ensures it triggers every time.
+  const isInView = useInView(ref, { once: false, amount: threshold });
+  const controls = useAnimation();
   const shouldReduceMotion = useReducedMotion();
 
+  useEffect(() => {
+    let timeoutId: string | number | NodeJS.Timeout;
+
+    if (isInView) {
+      // If entering view, animate immediately
+      controls.start("visible");
+    } else {
+      // If leaving view, wait a bit before hiding to avoid flicker/micro-scroll issues
+      timeoutId = setTimeout(() => {
+        controls.start("hidden");
+      }, 150); // 150ms debounce/cooldown
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [isInView, controls]);
+
   const variants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
+    hidden: { 
+      opacity: 0, 
+      y: shouldReduceMotion ? 0 : 16, // Reduced displacement
+      scale: shouldReduceMotion ? 1 : 0.98 
+    },
     visible: { 
       opacity: 1, 
       y: 0,
+      scale: 1,
       transition: {
         duration: duration,
         ease: PREMIUM_EASE,
@@ -43,7 +66,7 @@ export const Reveal: React.FC<RevealProps> = ({
       <motion.div
         variants={variants}
         initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        animate={controls}
       >
         {children}
       </motion.div>
@@ -61,11 +84,26 @@ interface RevealStaggerProps {
 export const RevealStagger: React.FC<RevealStaggerProps> = ({ 
   children, 
   className = "",
-  stagger = 0.1,
+  stagger = 0.2, // Slower ripple (0.2s)
   threshold = 0.2
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: threshold });
+  const isInView = useInView(ref, { once: false, amount: threshold });
+  const controls = useAnimation();
+  
+  useEffect(() => {
+    let timeoutId: string | number | NodeJS.Timeout;
+
+    if (isInView) {
+      controls.start("visible");
+    } else {
+      timeoutId = setTimeout(() => {
+        controls.start("hidden");
+      }, 150);
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [isInView, controls]);
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -73,7 +111,7 @@ export const RevealStagger: React.FC<RevealStaggerProps> = ({
       opacity: 1,
       transition: {
         staggerChildren: stagger,
-        delayChildren: 0.1 // small initial delay
+        delayChildren: 0.15 // Consistent initial delay
       }
     }
   };
@@ -84,7 +122,7 @@ export const RevealStagger: React.FC<RevealStaggerProps> = ({
       className={className}
       variants={containerVariants}
       initial="hidden"
-      animate={isInView ? "visible" : "hidden"}
+      animate={controls}
     >
       {children}
     </motion.div>

@@ -5,6 +5,7 @@ import Icon from './Icon';
 import Button from './Button';
 import logo from '../assets/logo.png';
 import { NAV_LINKS } from '../constants';
+import { useScrollSpy } from '../hooks/useScrollSpy';
 
 interface NavbarProps {
   onOpenModal: () => void;
@@ -14,6 +15,17 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const shouldReduceMotion = useReducedMotion();
+  
+  // Extract section IDs from NAV_LINKS for the spy
+  // NAV_LINKS format: /#id. We need just the id string.
+  const sectionIds = NAV_LINKS.map(link => link.href.split('#')[1]).filter(Boolean);
+  
+  // State to track if we are scrolling programmatically
+  const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false);
+  
+  // Pass paused=true when scrolling programmatically to prevent spy from overwriting
+  const activeSection = useScrollSpy(sectionIds, 0, isProgrammaticScroll);
+  
   const [activeLink, setActiveLink] = useState('');
 
   useEffect(() => {
@@ -25,33 +37,75 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Simple active link detection logic
+  // Sync internal activeLink state with ScrollSpy result when on home
   useEffect(() => {
-    const currentPath = location.pathname;
-    const currentHash = location.hash;
-    
-    // Default active to home if at root
-    if (currentPath === '/' && !currentHash) {
-        setActiveLink('Início'); // Assuming 'Início' corresponds to '/' or '#home'
-        return;
-    }
+     if (isProgrammaticScroll) return; // Ignore spy updates during programmatic scroll
 
-    // Mapping logic ideally matches NAV_LINKS structure
-    const foundLink = NAV_LINKS.find(link => {
-       if (link.href === '/') return currentPath === '/' && !currentHash; // or #home
-       if (link.href.startsWith('/#')) {
-           return currentPath === '/' && currentHash === link.href.substring(1);
-       }
-       return currentPath === link.href;
-    });
+     if (location.pathname === '/') {
+        // If we have an active section from spy, use it.
+        // But map it back to the Link Name?
+        // NAV_LINKS has name and href.
+        // If activeSection is 'sobre', we find link with href '/#sobre'.
+        if (activeSection) {
+            const link = NAV_LINKS.find(l => l.href.endsWith(`#${activeSection}`));
+            if (link) setActiveLink(link.name);
+        } else if (window.scrollY < 100) {
+            // Default to Home/Início if at top
+            setActiveLink('Início');
+        }
+     } else {
+        // If not on home, matching logic based on path
+        const currentPath = location.pathname;
+        const found = NAV_LINKS.find(l => l.href === currentPath);
+        if (found) setActiveLink(found.name);
+     }
+  }, [activeSection, location.pathname, isProgrammaticScroll]);
 
-    if (foundLink) {
-        setActiveLink(foundLink.name);
-    } else {
-        // Fallback for sub-routes or specific interactions
-        if (currentPath === '/') setActiveLink('Início');
-    }
-  }, [location]);
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, linkName: string) => {
+      // Check if it's a hash link
+      if (href.includes('#')) {
+          const targetId = href.split('#')[1];
+          const element = document.getElementById(targetId);
+
+          if (element) {
+              e.preventDefault();
+              
+              // OPTIMISTIC UI: Update immediate on click
+              setActiveLink(linkName);
+              
+              // Set programmatic scroll to pause spy
+              setIsProgrammaticScroll(true);
+              
+              // Update URL immediately
+              window.history.replaceState(null, "", `#${targetId}`);
+              
+              // Smooth scroll with offset for sticky header
+              // Header is h-20 (80px). Let's add a bit more space.
+              const headerOffset = 85; 
+              const elementPosition = element.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+              window.scrollTo({
+                  top: offsetPosition,
+                  behavior: shouldReduceMotion ? 'auto' : 'smooth'
+              });
+              
+              // Re-enable spy after scroll (approximate duration)
+              setTimeout(() => {
+                  setIsProgrammaticScroll(false);
+              }, 800); // 800ms covers most smooth scrolls
+          } else {
+              // If element not found, standard navigation (handled by Link usually, but here we preventDefault).
+              // If it's a cross-page hash link (e.g. from /projects to /#contact),
+              // we rely on standard Link behavior if not intercepted.
+              // Logic: location.pathname check.
+              if (location.pathname !== '/') {
+                  // Allow default behavior to navigate to home
+                  return; 
+              }
+          }
+      }
+  };
 
   return (
     <>
@@ -69,47 +123,39 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
         <div className="mx-auto px-4 sm:px-6 lg:px-8 2xl:px-10 w-full max-w-[1200px] 2xl:max-w-[1400px]">
           <div className="flex justify-between items-center h-20">
             <div className="flex-shrink-0 flex items-center gap-2">
-              {location.pathname === '/' ? (
-                <a 
-                  href="#home"
-                  className="flex items-center gap-2"
-                >
-                  <img src={logo} alt="Redstone Engenharia" className="h-10 w-auto" />
-                  <span className="font-display font-light text-2xl tracking-tight text-gray-900 dark:text-white">
-                    Redstone Engenharia<span className="text-primary font-bold">.</span>
-                  </span>
-                </a>
-              ) : (
-                <Link to="/#home" className="flex items-center gap-2">
-                  <img src={logo} alt="Redstone Engenharia" className="h-10 w-auto" />
-                  <span className="font-display font-light text-2xl tracking-tight text-gray-900 dark:text-white">
-                    Redstone Engenharia<span className="text-primary font-bold">.</span>
-                  </span>
-                </Link>
-              )}
+              <Link 
+                to="/#home" 
+                className="flex items-center gap-2"
+                onClick={(e) => handleLinkClick(e, '/#home', 'Início')}
+              >
+                 <img src={logo} alt="Redstone Engenharia" className="h-10 w-auto" />
+                 <span className="font-display font-light text-2xl tracking-tight text-gray-900 dark:text-white">
+                   Redstone Engenharia<span className="text-primary font-bold">.</span>
+                 </span>
+              </Link>
             </div>
 
             {/* Desktop Links */}
             <div className="hidden md:flex space-x-10">
               {NAV_LINKS.map((link) => {
-                 const isHome = location.pathname === '/';
-                 const href = isHome 
-                    ? (link.href.startsWith('/#') ? link.href.substring(1) : (link.href === '/' ? '#' : link.href))
-                    : link.href;
-                 
                  const isActive = activeLink === link.name;
+                 const isHash = link.href.includes('#');
 
+                 // Use standard <a> if on same page hash link to avoid Router overhead?
+                 // Or use Link from router.
+                 // We intercept click anyway.
+                 
                  return (
-                    <a 
+                    <Link 
                       key={link.name}
-                      href={href}
+                      to={link.href}
                       className={`relative text-sm font-medium tracking-wide transition-colors uppercase py-1
                         ${isActive 
                            ? 'text-primary' 
                            : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary hover:opacity-80'
                         }
                       `}
-                      onClick={() => setActiveLink(link.name)}
+                      onClick={(e) => handleLinkClick(e, link.href, link.name)}
                     >
                       {link.name}
                       {isActive && !shouldReduceMotion && (
@@ -119,7 +165,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
                             transition={{ type: "spring", stiffness: 350, damping: 30 }}
                         />
                       )}
-                    </a>
+                    </Link>
                  );
               })}
             </div>

@@ -10,7 +10,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onOpenModal }) => {
   return (
-    <footer id="contact" className="bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-white/10 pt-20 pb-10">
+    <footer id="contato" className="bg-background-light dark:bg-background-dark border-t border-gray-200 dark:border-white/10 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
           

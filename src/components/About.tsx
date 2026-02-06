@@ -4,7 +4,7 @@ import { Reveal, RevealStagger } from './Reveal';
 
 const About: React.FC = () => {
   return (
-    <section id="about" className="py-24 lg:py-32 bg-background-light dark:bg-background-dark">
+    <section id="sobre" className="py-24 lg:py-32 bg-background-light dark:bg-background-dark">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           

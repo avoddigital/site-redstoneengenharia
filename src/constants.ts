@@ -14,10 +14,10 @@ export const IMAGES = {
 
 export const NAV_LINKS = [
   { name: 'Início', href: '/#home' },
-  { name: 'Sobre', href: '/#about' },
-  { name: 'Serviços', href: '/#services' },
-  { name: 'Projetos', href: '/#projects' },
-  { name: 'Contato', href: '/#contact' },
+  { name: 'Sobre', href: '/#sobre' },
+  { name: 'Serviços', href: '/#servicos' },
+  { name: 'Projetos', href: '/#projetos' },
+  { name: 'Contato', href: '/#contato' },
 ];
 
 export const SERVICES_DATA = [

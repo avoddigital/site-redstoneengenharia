@@ -40,7 +40,7 @@ const Services: React.FC = () => {
   }, []);
 
   return (
-    <section id="services" className="py-24 bg-surface-light dark:bg-surface-dark overflow-hidden">
+    <section id="servicos" className="py-24 bg-surface-light dark:bg-surface-dark overflow-hidden">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 2xl:px-10 w-full max-w-[1200px] 2xl:max-w-[1400px] relative group/section">
         
         {/* Header */}

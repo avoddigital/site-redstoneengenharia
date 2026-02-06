@@ -137,8 +137,8 @@ const ProjectsPage: React.FC = () => {
                                 visible: { 
                                     opacity: 1,
                                     transition: {
-                                        staggerChildren: 0.1,
-                                        delayChildren: 0.05
+                                        staggerChildren: 0.2,
+                                        delayChildren: 0.15
                                     }
                                 },
                                 exit: { 
@@ -153,11 +153,11 @@ const ProjectsPage: React.FC = () => {
                                     layoutId={`project-${project.id}`} // Optional: keeps same items stable if we weren't unmounting, but with mode="wait" keying category usually unmounts all. 
                                     // However, for pure category switch, if we want cross-fade, mode="wait" is best.
                                     variants={{
-                                        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 10 },
+                                        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 16 },
                                         visible: { 
                                             opacity: 1, 
                                             y: 0,
-                                            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                                            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
                                         }
                                     }}
                                     className="group relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl h-[400px] w-full"
