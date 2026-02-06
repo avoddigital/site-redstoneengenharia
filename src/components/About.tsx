@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from './Icon';
+import { Reveal, RevealStagger } from './Reveal';
 
 const About: React.FC = () => {
   return (
@@ -8,7 +9,7 @@ const About: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
           
           {/* Text Content */}
-          <div>
+          <Reveal>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-light text-gray-900 dark:text-white leading-[1.1] tracking-tight">
               Construímos as <span className="text-primary italic font-normal">estruturas</span> que definem o horizonte.
             </h2>
@@ -18,10 +19,10 @@ const About: React.FC = () => {
                 De complexas instalações industriais a torres residenciais, a Redstone Engenharia traz uma mistura única de maestria técnica e visão estética. Nós não apenas construímos; criamos legados duradouros.
               </p>
             </div>
-          </div>
+          </Reveal>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-8">
+          <RevealStagger className="grid grid-cols-2 gap-8" stagger={0.15}>
             <div className="bg-surface-light dark:bg-surface-dark p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/30 transition-colors group">
               <div className="mb-4">
                  <Icon name="engineering" className="text-4xl text-primary group-hover:scale-110 transition-transform inline-block" />
@@ -48,7 +49,7 @@ const About: React.FC = () => {
                 Nossa estrutura de segurança garante execução com zero incidentes em todos os megaprojestos.
               </p>
             </div>
-          </div>
+          </RevealStagger>
 
         </div>
       </div>
