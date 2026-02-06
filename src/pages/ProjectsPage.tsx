@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProposalModal from '../components/ProposalModal';
@@ -49,15 +50,35 @@ const PROJECTS = [
   }
 ];
 
-const CATEGORIES = ['Todos', 'Residencial', 'Corporativo', 'Industrial', 'Reformas'];
+  // Constants
+const CATEGORIES = [
+  { id: 'todos', label: 'Todos' },
+  { id: 'residencial', label: 'Residencial' },
+  { id: 'corporativo', label: 'Corporativo' },
+  { id: 'industrial', label: 'Industrial' },
+  { id: 'reformas', label: 'Reformas' }
+] as const;
+
+type CategoryId = typeof CATEGORIES[number]['id'];
 
 const ProjectsPage: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [activeCategory, setActiveCategory] = useState<CategoryId>('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Robust Filtering Logic
   const filteredProjects = useMemo(() => {
-    if (activeCategory === 'Todos') return PROJECTS;
-    return PROJECTS.filter(project => project.category === activeCategory);
+    // Immutable copy strategy not strictly needed for filter but good practice if sorting
+    const projects = [...PROJECTS]; 
+
+    if (activeCategory === 'todos') {
+        return projects;
+    }
+
+    return projects.filter(project => {
+        // Safe case-insensitive comparison
+        const normalizedProjectCategory = project.category.trim().toLowerCase();
+        return normalizedProjectCategory === activeCategory;
+    });
   }, [activeCategory]);
 
   return (
@@ -80,46 +101,59 @@ const ProjectsPage: React.FC = () => {
             <div className="flex flex-wrap gap-6 mb-12 border-b border-gray-200 dark:border-gray-800 pb-4">
                 {CATEGORIES.map((category) => (
                     <button
-                        key={category}
-                        onClick={() => setActiveCategory(category)}
+                        key={category.id}
+                        onClick={() => setActiveCategory(category.id)}
                         className={`text-sm md:text-base font-medium transition-all duration-300 relative pb-2
-                            ${activeCategory === category 
+                            ${activeCategory === category.id 
                                 ? 'text-primary' 
                                 : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
                             }
                         `}
                     >
-                        {category}
-                        {activeCategory === category && (
-                            <span className="absolute bottom-[-17px] left-0 w-full h-[2px] bg-primary rounded-full" />
+                        {category.label}
+                        {activeCategory === category.id && (
+                            <motion.span 
+                                layoutId="activeCategory"
+                                className="absolute bottom-[-17px] left-0 w-full h-[2px] bg-primary rounded-full" 
+                            />
                         )}
                     </button>
                 ))}
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 2xl:gap-12">
-                {filteredProjects.map((project) => (
-                    <div 
-                        key={project.id} 
-                        className="group relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl h-[400px] w-full"
-                    >
-                        <img 
-                            src={project.imageSrc} 
-                            alt={project.title} 
-                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <h3 className="text-white text-xl font-medium">{project.title}</h3>
-                            <p className="text-white/80 text-sm mt-1">{project.location}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <motion.div 
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 2xl:gap-12 min-h-[400px]"
+                layout
+            >
+                <AnimatePresence mode="popLayout" initial={false}>
+                    {filteredProjects.map((project) => (
+                        <motion.div 
+                            key={project.id} 
+                            layout
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.3 }}
+                            className="group relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl h-[400px] w-full"
+                        >
+                            <img 
+                                src={project.imageSrc} 
+                                alt={project.title} 
+                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                <h3 className="text-white text-xl font-medium">{project.title}</h3>
+                                <p className="text-white/80 text-sm mt-1">{project.location}</p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </motion.div>
             
             {filteredProjects.length === 0 && (
                 <div className="py-20 text-center text-gray-500 dark:text-gray-400">
-                    Nenhum projeto encontrado nesta categoria.
+                    <p className="text-xl font-light">Nenhum projeto encontrado nesta categoria.</p>
                 </div>
             )}
 

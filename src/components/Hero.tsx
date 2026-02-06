@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import TransitionLink from './TransitionLink';
 import Icon from './Icon';
 import { IMAGES } from '../constants';
 
@@ -37,12 +38,16 @@ const Hero: React.FC = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 pt-4 w-full sm:w-auto">
-                <Link to="/projetos" className="w-full sm:w-auto justify-center bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 group/btn">
+                <TransitionLink 
+                  to="/projetos" 
+                  className="w-full sm:w-auto justify-center bg-white text-black px-8 py-4 rounded-full font-medium hover:bg-gray-100 transition-colors flex items-center gap-2 group/btn"
+                  label="Abrindo portfólio"
+                >
                   Ver projetos
                   <span className="transition-transform group-hover/btn:translate-x-1">
                      <Icon name="arrow_outward" />
                   </span>
-                </Link>
+                </TransitionLink>
                 <button className="w-full sm:w-auto justify-center px-8 py-4 rounded-full font-light text-white border border-white/30 hover:bg-white/10 transition-colors backdrop-blur-sm flex items-center gap-2">
                   <Icon name="play_circle" />
                   Assistir Showreel
