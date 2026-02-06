@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import ProposalModal from '../components/ProposalModal';
 import Icon from '../components/Icon';
 import { Link } from 'react-router-dom';
+import PageToc from '../components/PageToc';
 
 const TermsOfUsePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,19 +70,8 @@ const TermsOfUsePage: React.FC = () => {
           
           {/* Sidebar Navigation - Sticky */}
           <aside className="lg:w-64 hidden lg:block relative">
-            <div className="sticky top-32 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-sm uppercase tracking-wider text-gray-400 mb-4">Nesta página</h3>
-              <nav className="space-y-3">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className="block text-sm text-gray-600 hover:text-primary transition-colors text-left w-full"
-                  >
-                    {section.title}
-                  </button>
-                ))}
-              </nav>
+            <div className="sticky top-32">
+              <PageToc sections={sections} />
             </div>
           </aside>
 
