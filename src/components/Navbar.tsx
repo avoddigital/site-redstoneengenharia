@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import Icon from './Icon';
 import Button from './Button';
@@ -14,6 +14,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
   
   // Extract section IDs from NAV_LINKS for the spy
@@ -61,48 +62,75 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
      }
   }, [activeSection, location.pathname, isProgrammaticScroll]);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, linkName: string) => {
-      // Check if it's a hash link
-      if (href.includes('#')) {
-          const targetId = href.split('#')[1];
-          const element = document.getElementById(targetId);
+  // Helper to handle smooth scroll to section
+  const scrollToSection = (targetId: string) => {
+    const element = document.getElementById(targetId);
+    if (element) {
+        // OPTIMISTIC UI: Update immediate on click
+        // Find link name for the target ID to set active state
+        const link = NAV_LINKS.find(l => l.href.endsWith(`#${targetId}`));
+        if (link) setActiveLink(link.name);
+        
+        // Set programmatic scroll to pause spy
+        setIsProgrammaticScroll(true);
+        
+        // Update URL
+        // If we are already on home, we can use replaceState.
+        // If we just arrived from another page, the hash is already in URL from navigate(), so replaceState confirms it.
+        if (window.location.hash !== `#${targetId}`) {
+             window.history.replaceState(null, "", `#${targetId}`);
+        }
+        
+        // Smooth scroll with offset for sticky header
+        const headerOffset = 85; 
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-          if (element) {
-              e.preventDefault();
-              
-              // OPTIMISTIC UI: Update immediate on click
-              setActiveLink(linkName);
-              
-              // Set programmatic scroll to pause spy
-              setIsProgrammaticScroll(true);
-              
-              // Update URL immediately
-              window.history.replaceState(null, "", `#${targetId}`);
-              
-              // Smooth scroll with offset for sticky header
-              // Header is h-20 (80px). Let's add a bit more space.
-              const headerOffset = 85; 
-              const elementPosition = element.getBoundingClientRect().top;
-              const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      
-              window.scrollTo({
-                  top: offsetPosition,
-                  behavior: shouldReduceMotion ? 'auto' : 'smooth'
-              });
-              
-              // Re-enable spy after scroll (approximate duration)
-              setTimeout(() => {
-                  setIsProgrammaticScroll(false);
-              }, 800); // 800ms covers most smooth scrolls
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: shouldReduceMotion ? 'auto' : 'smooth'
+        });
+        
+        // Re-enable spy after scroll
+        setTimeout(() => {
+            setIsProgrammaticScroll(false);
+        }, 800);
+    }
+  };
+
+  const handleLinkClick = async (e: React.MouseEvent<HTMLAnchorElement>, href: string, linkName: string) => {
+      // Check if it's a hash link for the One Page (e.g. /#home)
+      if (href.includes('/#')) {
+          e.preventDefault();
+          const targetId = href.split('#')[1];
+
+          // If we are already on the home page (or base path)
+          if (location.pathname === '/') {
+              scrollToSection(targetId);
           } else {
-              // If element not found, standard navigation (handled by Link usually, but here we preventDefault).
-              // If it's a cross-page hash link (e.g. from /projects to /#contact),
-              // we rely on standard Link behavior if not intercepted.
-              // Logic: location.pathname check.
-              if (location.pathname !== '/') {
-                  // Allow default behavior to navigate to home
-                  return; 
-              }
+              // We are on an internal page (e.g. /politica-de-privacidade)
+              // We need to navigate to Home first
+              setActiveLink(linkName); // Optimistic update
+              
+              // Navigate to the hash URL
+              navigate(href);
+
+              // Retry mechanism to scroll after navigation completes and DOM is ready
+              let attempts = 0;
+              const maxAttempts = 15;
+              
+              const tryScroll = () => {
+                  const element = document.getElementById(targetId);
+                  if (element) {
+                      scrollToSection(targetId);
+                  } else if (attempts < maxAttempts) {
+                      attempts++;
+                      setTimeout(tryScroll, 100); // Retry every 100ms
+                  }
+              };
+              
+              // Start trying to scroll
+              setTimeout(tryScroll, 100);
           }
       }
   };
