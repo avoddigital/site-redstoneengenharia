@@ -25,9 +25,9 @@ const App: React.FC = () => {
                 <Route path="/politica-de-privacidade" element={<PrivacyPolicyPage />} />
                 <Route path="/termos-de-uso" element={<TermsOfUsePage />} />
             </Routes>
-            <CookieBanner />
-            <CookiePreferencesModal />
         </PageContentWrapper>
+        <CookieBanner />
+        <CookiePreferencesModal />
         </CookieConsentProvider>
     </PageTransitionProvider>
   );

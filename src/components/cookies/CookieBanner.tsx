@@ -7,7 +7,7 @@ const CookieBanner: React.FC = () => {
   if (!bannerOpen) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 flex justify-center animate-in slide-in-from-bottom-5 fade-in duration-500">
+    <div className="fixed bottom-0 left-0 right-0 z-[9999] p-4 flex justify-center animate-in slide-in-from-bottom-5 fade-in duration-500">
       <div className="bg-white/95 backdrop-blur-md border border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] rounded-[24px] p-6 w-full max-w-[1200px] flex flex-col md:flex-row items-center gap-6">
         
         {/* Text Content */}
