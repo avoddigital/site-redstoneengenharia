@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProposalModal from '../components/ProposalModal';
@@ -64,6 +64,7 @@ type CategoryId = typeof CATEGORIES[number]['id'];
 const ProjectsPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<CategoryId>('todos');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   // Robust Filtering Logic
   const filteredProjects = useMemo(() => {
@@ -122,40 +123,70 @@ const ProjectsPage: React.FC = () => {
             </div>
 
             {/* Grid */}
-            <motion.div 
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 2xl:gap-12 min-h-[400px]"
-                layout
-            >
-                <AnimatePresence mode="popLayout" initial={false}>
-                    {filteredProjects.map((project) => (
+            <div className="min-h-[400px] relative">
+                <AnimatePresence mode="wait">
+                    {filteredProjects.length > 0 ? (
                         <motion.div 
-                            key={project.id} 
-                            layout
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.3 }}
-                            className="group relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl h-[400px] w-full"
+                            key={activeCategory} // Keying by category triggers full re-mount for stagger
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 2xl:gap-12"
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: { 
+                                    opacity: 1,
+                                    transition: {
+                                        staggerChildren: 0.1,
+                                        delayChildren: 0.05
+                                    }
+                                },
+                                exit: { 
+                                    opacity: 0,
+                                    transition: { duration: 0.2 } // Fast fade out
+                                }
+                            }}
                         >
-                            <img 
-                                src={project.imageSrc} 
-                                alt={project.title} 
-                                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                <h3 className="text-white text-xl font-medium">{project.title}</h3>
-                                <p className="text-white/80 text-sm mt-1">{project.location}</p>
-                            </div>
+                            {filteredProjects.map((project) => (
+                                <motion.div 
+                                    key={project.id} 
+                                    layoutId={`project-${project.id}`} // Optional: keeps same items stable if we weren't unmounting, but with mode="wait" keying category usually unmounts all. 
+                                    // However, for pure category switch, if we want cross-fade, mode="wait" is best.
+                                    variants={{
+                                        hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 10 },
+                                        visible: { 
+                                            opacity: 1, 
+                                            y: 0,
+                                            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                                        }
+                                    }}
+                                    className="group relative cursor-pointer overflow-hidden rounded-2xl md:rounded-3xl h-[400px] w-full"
+                                >
+                                    <img 
+                                        src={project.imageSrc} 
+                                        alt={project.title} 
+                                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                        <h3 className="text-white text-xl font-medium">{project.title}</h3>
+                                        <p className="text-white/80 text-sm mt-1">{project.location}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
                         </motion.div>
-                    ))}
+                    ) : (
+                        <motion.div 
+                            key="empty"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 flex items-center justify-center py-20 text-center text-gray-500 dark:text-gray-400"
+                        >
+                            <p className="text-xl font-light">Nenhum projeto encontrado nesta categoria.</p>
+                        </motion.div>
+                    )}
                 </AnimatePresence>
-            </motion.div>
-            
-            {filteredProjects.length === 0 && (
-                <div className="py-20 text-center text-gray-500 dark:text-gray-400">
-                    <p className="text-xl font-light">Nenhum projeto encontrado nesta categoria.</p>
-                </div>
-            )}
+            </div>
 
         </main>
 
