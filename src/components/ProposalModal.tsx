@@ -29,14 +29,19 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onSubmit }
 
     if (open) {
       document.addEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'hidden'; // Lock Body Scroll
+      
       // Focus on name input when modal opens with a slight delay for animation
       setTimeout(() => {
         nameInputRef.current?.focus();
       }, 100);
+    } else {
+      document.body.style.overflow = ''; // Unlock Body Scroll
     }
 
     return () => {
       document.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = ''; // Cleanup to ensure unlock
     };
   }, [open, onClose]);
 
@@ -81,14 +86,13 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onSubmit }
 
   return (
     <div 
-      className="fixed inset-0 z-[100] overflow-y-auto bg-white/60 backdrop-blur-sm transition-all duration-300"
+      className="fixed inset-0 z-[100] h-screen w-screen overflow-hidden bg-black/20 backdrop-blur-sm transition-all duration-300 flex items-center justify-center p-4 sm:p-6"
       onClick={onClose}
       aria-modal="true"
       role="dialog"
     >
-      <div className="flex min-h-full items-center justify-center p-4">
       <div 
-        className="relative w-full max-w-full md:max-w-5xl bg-white rounded-[32px] shadow-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-300"
+        className="relative w-full max-w-[600px] md:max-w-4xl bg-white rounded-[32px] shadow-2xl shadow-black/10 overflow-hidden border border-white/50 animate-in fade-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Logo Watermark */}
@@ -317,7 +321,6 @@ const ProposalModal: React.FC<ProposalModalProps> = ({ open, onClose, onSubmit }
             </div>
           </form>
         </div>
-      </div>
       </div>
     </div>
   );
